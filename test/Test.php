@@ -6,7 +6,7 @@ class Test extends PHPUnit_Framework_TestCase
     {
         parent::__construct($name, $data, $dataName);
 
-        $Base = new \Base\Base('mysql:host=localhost;dbname=test', 'root');
+        $Base = new \SC\SC('mysql:host=localhost;dbname=test', 'root');
 
         $this->Base = $Base;
     }

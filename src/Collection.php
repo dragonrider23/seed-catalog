@@ -1,6 +1,6 @@
 <?php
 
-namespace Base;
+namespace SC;
 
 class Collection
 {
@@ -8,7 +8,7 @@ class Collection
      * @param Base $Base
      * @param string $table
      */
-    function __construct(Base $Base, $table)
+    function __construct(SC $Base, $table)
     {
         $this->Base = $Base;
         $this->table = $table;

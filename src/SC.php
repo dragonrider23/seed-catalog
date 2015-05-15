@@ -1,12 +1,12 @@
 <?php
 
-namespace Base;
+namespace SC;
 
 use Exception;
 use PDO;
 use PDOStatement;
 
-class Base
+class SC
 {
     /**
      * Takes the same parameters as the PDO constructor.
