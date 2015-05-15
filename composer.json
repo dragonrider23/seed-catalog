@@ -1,8 +1,8 @@
 {
-    "name": "erusev/base",
+    "name": "onesimus-systems/seed-catalog",
     "description": "Simple ORM.",
     "keywords": ["orm", "database", "pdo"],
-    "homepage": "https://github.com/erusev/base",
+    "homepage": "https://github.com/onesimus-systems/seed-catalog",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -10,6 +10,11 @@
             "name": "Emanuil Rusev",
             "email": "hello@erusev.com",
             "homepage": "http://erusev.com"
+        },
+        {
+            "name": "Lee Keitel",
+            "email": "onesimussystems@gmail.com",
+            "homepage": "http://onesimussystems.com"
         }
     ],
     "autoload": {

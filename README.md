@@ -1,8 +1,8 @@
-## Base
+## Seed Catalog
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/c8843251-ba46-4be5-be0e-9af19170ac83/mini.png)](https://insight.sensiolabs.com/projects/c8843251-ba46-4be5-be0e-9af19170ac83)
+Seed Catalog is a simple database interface in PHP. It aims to make the most common interactions with the database easier. I've been using it for quite some time. I felt like it's about time I share it.
 
-Base is a simple database interface in PHP. It aims to make the most common interactions with the database easier. I've been using it for quite some time. I felt like it's about time I share it.
+Seed Catalog is a fork of the [Base](https://github.com/erusev/base) project by erusev.
 
 ### Features
 
@@ -15,7 +15,7 @@ Base is a simple database interface in PHP. It aims to make the most common inte
 
 ### Installation
 
-Include both `Base.php` and `Collection.php` or install [the composer package](https://packagist.org/packages/erusev/base).
+Include both `Base.php` and `Collection.php` or install [the composer package](https://packagist.org/packages/onesimus-systems/seed-catalog).
 
 ### Examples
 
@@ -82,11 +82,11 @@ $Base->update('UPDATE INTO user SET is_verified = ?', [1]);
 ### Notes
 
 - Relationship methods require that table names are singular - ex: `user` instead of `users`.
-- Not tested on other RDBMSs than MySQL
+- Currently supports only MySQL.
 
-### Status
 
-[![Build Status](http://img.shields.io/travis/erusev/base.svg?style=flat-square)](https://travis-ci.org/erusev/base)
 <!--
+[![Build Status](http://img.shields.io/travis/erusev/base.svg?style=flat-square)](https://travis-ci.org/erusev/base)
+
 [![Latest Stable Version](http://img.shields.io/packagist/v/erusev/base.svg?style=flat-square)](https://packagist.org/packages/erusev/base)
 -->
