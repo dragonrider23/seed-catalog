@@ -4,21 +4,9 @@ namespace SC;
 
 class Collection
 {
-    /**
-     * @param Base $Base
-     * @param string $table
-     */
-    function __construct(SC $Base, $table)
-    {
-        $this->Base = $Base;
-        $this->table = $table;
-
-        $this->tableClause = "`$table`";
-        $this->whereClause = '1';
-    }
-
     private $Base;
     private $table;
+    private $escapeChar = '';
 
     # ~
 
@@ -30,6 +18,20 @@ class Collection
     private $limitClause;
     private $orderClause;
 
+    /**
+     * @param Base $Base
+     * @param string $table
+     */
+    public function __construct(SC $Base, $table)
+    {
+        $this->Base = $Base;
+        $this->table = $table;
+
+        $this->escapeChar = $Base->escapeChar;
+        $this->tableClause = "{$this->escapeChar}$table{$this->escapeChar}";
+        $this->whereClause = '1';
+    }
+
     #
     # Relationships
     #
@@ -39,11 +41,11 @@ class Collection
      * @param string $foreignKey
      * @return $this
      */
-    function has($table, $foreignKey = null)
+    public function has($table, $foreignKey = null)
     {
         $foreignKey = $foreignKey ?: $this->table.$this->Base->fkEnding;
 
-        $this->tableClause .= " LEFT JOIN `$table` ON `$this->table`.`id` = `$table`.`$foreignKey`";
+        $this->tableClause .= " LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar}";
 
         return $this;
     }
@@ -53,11 +55,11 @@ class Collection
      * @param string $foreignKey
      * @return $this
      */
-    function belongsTo($table, $foreignKey = null)
+    public function belongsTo($table, $foreignKey = null)
     {
         $foreignKey = $foreignKey ?: $table.$this->Base->fkEnding;
 
-        $this->tableClause .= " LEFT JOIN `$table` ON `$this->table`.`$foreignKey` = `$table`.`id`";
+        $this->tableClause .= " LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar} = {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar}";
 
         return $this;
     }
@@ -66,7 +68,7 @@ class Collection
      * @param string $table
      * @return $this
      */
-    function hasAndBelongsTo($table)
+    public function hasAndBelongsTo($table)
     {
         $tables = array($this->table, $table);
 
@@ -78,8 +80,8 @@ class Collection
         $bKey = $table.$this->Base->fkEnding;
 
         $this->tableClause .= "
-			LEFT JOIN `$joinTable` ON `$this->table`.`id` = `$joinTable`.`$aKey`
-			LEFT JOIN `$table` ON `$table`.`id` = `$joinTable`.`$bKey`";
+			LEFT JOIN {$this->escapeChar}$joinTable{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$joinTable{$this->escapeChar}.{$this->escapeChar}$aKey{$this->escapeChar}
+			LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$joinTable{$this->escapeChar}.{$this->escapeChar}$bKey{$this->escapeChar}";
 
         return $this;
     }
@@ -93,7 +95,7 @@ class Collection
      * @param array $values
      * @return $this
      */
-    function where($condition, array $values = array())
+    public function where($condition, array $values = array())
     {
         $this->whereClause .= " AND $condition";
 
@@ -111,7 +113,7 @@ class Collection
      * @param bool $reverse
      * @return $this
      */
-    function whereEqual($field, $value, $reverse = false)
+    public function whereEqual($field, $value, $reverse = false)
     {
         $field = $this->escapeField($field);
 
@@ -129,7 +131,7 @@ class Collection
      * @param $value
      * @return $this
      */
-    function whereNotEqual($field, $value)
+    public function whereNotEqual($field, $value)
     {
         $this->whereEqual($field, $value, true);
 
@@ -142,7 +144,7 @@ class Collection
      * @param bool $reverse
      * @return $this
      */
-    function whereIn($field, array $values, $reverse = false)
+    public function whereIn($field, array $values, $reverse = false)
     {
         $field = $this->escapeField($field);
 
@@ -167,7 +169,7 @@ class Collection
      * @param array $values
      * @return $this
      */
-    function whereNotIn($field, array $values)
+    public function whereNotIn($field, array $values)
     {
         $this->whereIn($field, $values, true);
 
@@ -179,7 +181,7 @@ class Collection
      * @param bool $reverse
      * @return $this
      */
-    function whereNull($field, $reverse = false)
+    public function whereNull($field, $reverse = false)
     {
         $field = $this->escapeField($field);
 
@@ -194,7 +196,7 @@ class Collection
      * @param string $field
      * @return $this
      */
-    function whereNotNull($field)
+    public function whereNotNull($field)
     {
         $this->whereNull($field, true);
 
@@ -209,7 +211,7 @@ class Collection
      * @param string $group
      * @return $this
      */
-    function group($group)
+    public function group($group)
     {
         $this->groupClause = $group;
 
@@ -224,7 +226,7 @@ class Collection
      * @param string $limit
      * @return $this
      */
-    function limit($limit)
+    public function limit($limit)
     {
         $this->limitClause = $limit;
 
@@ -239,7 +241,7 @@ class Collection
      * @param string $order
      * @return $this
      */
-    function order($order)
+    public function order($order)
     {
         $this->orderClause = $order;
 
@@ -250,7 +252,7 @@ class Collection
      * @param string $field
      * @return $this
      */
-    function orderAsc($field)
+    public function orderAsc($field)
     {
         $field = $this->escapeField($field);
 
@@ -263,7 +265,7 @@ class Collection
      * @param string $field
      * @return $this
      */
-    function orderDesc($field)
+    public function orderDesc($field)
     {
         $field = $this->escapeField($field);
 
@@ -282,7 +284,7 @@ class Collection
      * @param string $selectExpression
      * @return array
      */
-    function read($selectExpression = null)
+    public function read($selectExpression = null)
     {
         $statement = $this->composeReadStatement($selectExpression);
 
@@ -295,7 +297,7 @@ class Collection
      * @param string $selectExpression
      * @return array
      */
-    function readRecord($selectExpression = null)
+    public function readRecord($selectExpression = null)
     {
         $statement = $this->composeReadStatement($selectExpression);
 
@@ -308,7 +310,7 @@ class Collection
      * @param string $selectExpression
      * @return string
      */
-    function readField($selectExpression = null)
+    public function readField($selectExpression = null)
     {
         $statement = $this->composeReadStatement($selectExpression);
 
@@ -321,7 +323,7 @@ class Collection
      * @param string $selectExpression
      * @return array
      */
-    function readFields($selectExpression = null)
+    public function readFields($selectExpression = null)
     {
         $statement = $this->composeReadStatement($selectExpression);
 
@@ -333,7 +335,7 @@ class Collection
     /**
      * @return int
      */
-    function count()
+    public function count()
     {
         $count = (int) $this->readField('COUNT(*)');
 
@@ -344,15 +346,15 @@ class Collection
      * @param array $Data
      * @return int
      */
-    function update(array $Data)
+    public function update(array $Data)
     {
-        $statement = "UPDATE `$this->table` SET ";
+        $statement = "UPDATE {$this->escapeChar}$this->table{$this->escapeChar} SET ";
 
         $fields = array_keys($Data);
 
         foreach ($fields as $field)
         {
-            $statement .= "`$this->table`.`$field` = ?, ";
+            $statement .= "{$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}$field{$this->escapeChar} = ?, ";
         }
 
         $statement = substr_replace($statement, " WHERE $this->whereClause", - 2);
@@ -370,7 +372,7 @@ class Collection
     /**
      * @return int
      */
-    function delete()
+    public function delete()
     {
         $statement = "DELETE FROM $this->tableClause WHERE $this->whereClause";
 
@@ -392,7 +394,7 @@ class Collection
      */
     protected function composeReadStatement($selectExpression = null)
     {
-        $selectExpression = $selectExpression ?: "`$this->table`.*";
+        $selectExpression = $selectExpression ?: "{$this->escapeChar}$this->table{$this->escapeChar}.*";
 
         $query = "SELECT $selectExpression FROM $this->tableClause WHERE $this->whereClause";
 
@@ -411,7 +413,7 @@ class Collection
     {
         $field = str_replace('`', '', $field);
         $field = str_replace('.', '`.`', $field);
-        $field = '`'.$field.'`';
+        $field = $this->escapeChar.$field.$this->escapeChar;
 
         return $field;
     }

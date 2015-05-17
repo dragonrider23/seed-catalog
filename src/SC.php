@@ -2,12 +2,25 @@
 
 namespace SC;
 
-use Exception;
 use PDO;
 use PDOStatement;
 
 class SC
 {
+    private $PDO; // PDO connection
+    public $fkEnding = '_id'; // Ending for FK names
+    private static $instance; // SC instance
+    public $escapeChar = ''; // Character to escape identifiers
+
+    // Prevent spawning
+    private function __construct() {}
+    private function __clone() {}
+    public function __destruct()
+    {
+        $this->PDO = null;
+        return;
+    }
+
     /**
      * Takes the same parameters as the PDO constructor.
      * @link http://php.net/manual/en/pdo.construct.php
@@ -16,21 +29,44 @@ class SC
      * @param string $password [optional]
      * @param array $options [optional]
      */
-    function __construct($dsn, $username = null, $password = null, array $options = array())
+    public static function connect($type, $host, $dbname, $username = null, $password = null, array $options = array())
     {
-        $PDO = new PDO($dsn, $username, $password, $options);
+        if (!self::$instance) {
+            self::$instance = new self();
+            $dsn = "{$type}:host={$host};dbname={$dbname}";
+            $PDO = new PDO($dsn, $username, $password, $options);
 
-        $this->PDO = $PDO;
+            if (!$PDO) {
+                return false;
+            }
+
+            self::$instance->PDO = $PDO;
+
+            switch($PDO->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+                case 'pgsql':
+                case 'sqlsrv':
+                case 'dblib':
+                case 'mssql':
+                case 'sybase':
+                case 'firebird':
+                    self::$instance->escapeChar = '"';
+                case 'mysql':
+                case 'sqlite':
+                case 'sqlite2':
+                default:
+                    self::$instance->escapeChar = '`';
+            }
+        }
+
+        return self::$instance;
     }
-
-    private $PDO;
 
     /**
      * @param string $statement
      * @param array $parameters
      * @return array
      */
-    function read($statement, array $parameters = array())
+    public function read($statement, array $parameters = array())
     {
         $PDOStatement = $this->execute($statement, $parameters);
 
@@ -44,14 +80,13 @@ class SC
      * @param array $parameters
      * @return array
      */
-    function readField($statement, array $parameters = array())
+    public function readField($statement, array $parameters = array())
     {
         $PDOStatement = $this->execute($statement, $parameters);
 
         $Record = $PDOStatement->fetch(PDO::FETCH_COLUMN);
 
-        if ($Record === false)
-        {
+        if ($Record === false) {
             return;
         }
 
@@ -63,7 +98,7 @@ class SC
      * @param array $parameters
      * @return array
      */
-    function readFields($statement, array $parameters = array())
+    public function readFields($statement, array $parameters = array())
     {
         $PDOStatement = $this->execute($statement, $parameters);
 
@@ -77,14 +112,13 @@ class SC
      * @param array $parameters
      * @return array
      */
-    function readRecord($statement, array $parameters = array())
+    public function readRecord($statement, array $parameters = array())
     {
         $PDOStatement = $this->execute($statement, $parameters);
 
         $Record = $PDOStatement->fetch(PDO::FETCH_ASSOC);
 
-        if ($Record === false)
-        {
+        if ($Record === false) {
             return;
         }
 
@@ -96,7 +130,7 @@ class SC
      * @param int $id
      * @return array
      */
-    function readItem($table, $id)
+    public function readItem($table, $id)
     {
         $Record = $this->find($table)
             ->whereEqual('id', $id)
@@ -110,7 +144,7 @@ class SC
      * @param array $parameters
      * @return int
      */
-    function update($statement, array $parameters = array())
+    public function update($statement, array $parameters = array())
     {
         $PDOStatement = $this->execute($statement, $parameters);
 
@@ -125,7 +159,7 @@ class SC
      * @param array $Data
      * @return int
      */
-    function updateItem($table, $id, array $Data)
+    public function updateItem($table, $id, array $Data)
     {
         $impactedRecordCount = $this->find($table)
             ->whereEqual('id', $id)
@@ -139,20 +173,23 @@ class SC
      * @param array $Data
      * @return int
      */
-    function createItem($table, array $Data)
+    public function createItem($table, array $Data)
     {
-        $statement = "INSERT INTO `$table` SET";
+        $statement = "INSERT INTO {$this->escapeChar}{$table}{$this->escapeChar}";
+        $fields = '';
+        $values = '';
 
         $parameters = array();
 
-        foreach ($Data as $name => $value)
-        {
-            $statement .= " `$name` = ?,";
-
+        foreach ($Data as $name => $value) {
+            $fields .= "{$this->escapeChar}$name{$this->escapeChar}, ";
+            $values .= '?, ';
             $parameters []= $value;
         }
 
-        $statement = substr($statement, 0, - 1);
+        $fields = rtrim($fields, ', ');
+        $values = rtrim($values, ', ');
+        $statement = "{$statement} ({$fields}) VALUES ({$values})";
 
         $this->execute($statement, $parameters);
 
@@ -166,7 +203,7 @@ class SC
      * @param int $id
      * @return int
      */
-    function deleteItem($table, $id)
+    public function deleteItem($table, $id)
     {
         $impactedRecordCount = $this->find($table)
             ->whereEqual('id', $id)
@@ -179,7 +216,7 @@ class SC
      * @param string $table
      * @return Collection
      */
-    function find($table)
+    public function find($table)
     {
         $Collection = new Collection($this, $table);
 
@@ -192,17 +229,16 @@ class SC
      * @return PDOStatement
      * @throws Exception
      */
-    function execute($statement, array $parameters = array())
+    public function execute($statement, array $parameters = array())
     {
         $PDOStatement = $this->PDO->prepare($statement);
 
         $successful = $PDOStatement->execute($parameters);
 
-        if ( ! $successful)
-        {
+        if (!$successful) {
             $errorInfo = $PDOStatement->errorInfo();
-
-            throw new Exception($errorInfo[2].': '.$statement);
+            $errorCode = $PDOStatement->errorCode();
+            throw new SCException($errorInfo[2].': '.$statement, $errorCode);
         }
 
         return $PDOStatement;
@@ -211,7 +247,7 @@ class SC
     /**
      * @return int
      */
-    function lastId()
+    public function lastId()
     {
         $lastInsertId = (int) $this->PDO->lastInsertId();
 
@@ -221,17 +257,15 @@ class SC
     /**
      * @return PDO
      */
-    function pdo()
+    public function pdo()
     {
         $PDO = $this->PDO;
 
         return $PDO;
     }
 
-    /**
-     * The ending of FK names.
-     *
-     * @var string
-     */
-    public $fkEnding = '_id';
+    public function getEscapeQuote()
+    {
+        return $this->escapeChar;
+    }
 }
