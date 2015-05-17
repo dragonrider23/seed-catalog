@@ -15,75 +15,79 @@ Seed Catalog is a fork of the [Base](https://github.com/erusev/base) project by 
 
 ### Installation
 
-Include both `Base.php` and `Collection.php` or install [the composer package](https://packagist.org/packages/onesimus-systems/seed-catalog).
+Include `SC.php`, `Collection.php`, and 'SCException.php' or install [the composer package](https://packagist.org/packages/onesimus-systems/seed-catalog).
 
 ### Examples
 
 Connect to a database:
 ```php
-# the constructor takes the same parameters as the PDO constructor
-$Base = new \Base\Base('mysql:host=localhost;dbname=example', 'username', 'password');
+# initialize the connection
+# connect($dbtype, $host, $database, $username, $password);
+$SC = \SC\SC::connect('mysql', 'localhost', 'example', 'username', 'password');
+
+# to use the connection somewhere else, just call connect() with no parameters
+$SC = \SC\SC::connect();
+# connect() will return false if you haven't initialized it yet.
 ```
 
 Work with records:
 ```php
 # read user 1
-$Base->readItem('user', 1);
+$SC->readItem('user', 1);
 # update the username of user 1
-$Base->updateItem('user', 1, ['username' => 'john.doe']);
+$SC->updateItem('user', 1, ['username' => 'john.doe']);
 # create a user
-$Base->createItem('user', ['username' => 'jane.doe', 'email' => 'jane@example.com']);
+$SC->createItem('user', ['username' => 'jane.doe', 'email' => 'jane@example.com']);
 # delete user 1
-$Base->deleteItem('user', 1);
+$SC->deleteItem('user', 1);
 ```
 
 Work with collections:
 ```php
 # read all users
-$Base->find('user')->read();
+$SC->find('user')->read();
 # read the users that are marked as verified in a desc order
-$Base->find('user')->whereEqual('is_verified', 1)->orderDesc('id')->read();
+$SC->find('user')->whereEqual('is_verified', 1)->orderDesc('id')->read();
 # read the user with the most reputation
-$Base->find('user')->limit(1)->orderDesc('reputation')->readRecord();
+$SC->find('user')->limit(1)->orderDesc('reputation')->readRecord();
 # mark users 1 and 3 as verified
-$Base->find('user')->whereIn('id', [1, 3])->update(['is_verified' => 1]);
+$SC->find('user')->whereIn('id', [1, 3])->update(['is_verified' => 1]);
 # count the users that don't have a location
-$Base->find('user')->whereNull('location')->count();
+$SC->find('user')->whereNull('location')->count();
 # plain sql conditions are also supported
-$Base->find('user')->where('is_verified = ?', [1])->read();
+$SC->find('user')->where('is_verified = ?', [1])->read();
 ```
 
 Handle relationships:
 ```php
 # read the users that have a featured post
-$Base->find('user')->has('post')->whereEqual('post.is_featured', 1)->read();
+$SC->find('user')->has('post')->whereEqual('post.is_featured', 1)->read();
 # read the posts of user 1
-$Base->find('post')->belongsTo('user')->whereEqual('user.id', 1)->read();
+$SC->find('post')->belongsTo('user')->whereEqual('user.id', 1)->read();
 # read the posts that are tagged "php"
-$Base->find('post')->hasAndBelongsTo('tag')->whereEqual('tag.name', 'php')->read();
+$SC->find('post')->hasAndBelongsTo('tag')->whereEqual('tag.name', 'php')->read();
 # unconventional FK names are also supported
-$Base->find('user')->has('post', 'author_id')->whereEqual('user.id', 1)->read();
+$SC->find('user')->has('post', 'author_id')->whereEqual('user.id', 1)->read();
 ```
 
 Execute queries:
 ```php
 # read all users
-$Base->read('SELECT * FROM user');
+$SC->read('SELECT * FROM user');
 # read user 1
-$Base->readRecord('SELECT * FROM user WHERE id = ?', [1]);
+$SC->readRecord('SELECT * FROM user WHERE id = ?', [1]);
 # read the username of user 1
-$Base->readField('SELECT username FROM user WHERE id = ?', [1]);
+$SC->readField('SELECT username FROM user WHERE id = ?', [1]);
 # read all usernames
-$Base->readFields('SELECT username FROM user');
+$SC->readFields('SELECT username FROM user');
 # update all users
-$Base->update('UPDATE INTO user SET is_verified = ?', [1]);
+$SC->update('UPDATE INTO user SET is_verified = ?', [1]);
 ```
 
 ### Notes
 
 - Relationship methods require that table names are singular - ex: `user` instead of `users`.
-- Currently supports only MySQL.
-
+- Only tested with MySQL. It may work with Postgres and SQLite, but I haven't tested it yet.
 
 <!--
 [![Build Status](http://img.shields.io/travis/erusev/base.svg?style=flat-square)](https://travis-ci.org/erusev/base)

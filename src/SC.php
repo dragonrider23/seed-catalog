@@ -29,9 +29,13 @@ class SC
      * @param string $password [optional]
      * @param array $options [optional]
      */
-    public static function connect($type, $host, $dbname, $username = null, $password = null, array $options = array())
+    public static function connect($type = '', $host = '', $dbname = '', $username = null, $password = null, array $options = array())
     {
         if (!self::$instance) {
+            if (!$type && !$host && !$dbname) {
+                return false;
+            }
+
             self::$instance = new self();
             $dsn = "{$type}:host={$host};dbname={$dbname}";
             $PDO = new PDO($dsn, $username, $password, $options);
