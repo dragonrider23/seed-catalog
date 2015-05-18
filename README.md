@@ -1,5 +1,7 @@
 ## Seed Catalog
 
+[![Build Status](https://travis-ci.org/onesimus-systems/seed-catalog.svg?branch=master)](https://travis-ci.org/onesimus-systems/seed-catalog)
+
 Seed Catalog is a simple database interface in PHP. It aims to make the most common interactions with the database easier. I've been using it for quite some time. I felt like it's about time I share it.
 
 Seed Catalog is a fork of the [Base](https://github.com/erusev/base) project by erusev.
@@ -88,9 +90,3 @@ $SC->update('UPDATE INTO user SET is_verified = ?', [1]);
 
 - Relationship methods require that table names are singular - ex: `user` instead of `users`.
 - Only tested with MySQL. It may work with Postgres and SQLite, but I haven't tested it yet.
-
-<!--
-[![Build Status](http://img.shields.io/travis/erusev/base.svg?style=flat-square)](https://travis-ci.org/erusev/base)
-
-[![Latest Stable Version](http://img.shields.io/packagist/v/erusev/base.svg?style=flat-square)](https://packagist.org/packages/erusev/base)
--->
