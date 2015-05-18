@@ -22,9 +22,11 @@ class SC
     }
 
     /**
-     * Takes the same parameters as the PDO constructor.
-     * @link http://php.net/manual/en/pdo.construct.php
-     * @param string $dsn
+     * Connect to a database and instantiate an SC object
+     *
+     * @param string $type
+     * @param string $host
+     * @param string $dbname
      * @param string $username [optional]
      * @param string $password [optional]
      * @param array $options [optional]
