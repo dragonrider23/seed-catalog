@@ -7,15 +7,13 @@ php:
   - 5.4
   - 5.3
   - hhvm
-  - hhvm-nightly
-  
+
 matrix:
   allow_failures:
     - php: 7
-    - php: hhvm-nightly
 
 install:
-  - composer selfupdate
+  - composer self-update
   - composer install
 
 before_script:
