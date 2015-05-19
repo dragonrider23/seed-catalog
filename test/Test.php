@@ -7,7 +7,7 @@ class Test extends PHPUnit_Framework_TestCase
         parent::__construct($name, $data, $dataName);
 
         $Base = new \SC\SC();
-        $Base->connect('mysql', 'localhost', 'test', 'root', 'a');
+        $Base->connect('mysql', 'localhost', 'test', 'root');
         $this->Base = $Base;
     }
 
