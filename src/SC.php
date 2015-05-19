@@ -9,12 +9,8 @@ class SC
 {
     private $PDO; // PDO connection
     public $fkEnding = '_id'; // Ending for FK names
-    private static $instance; // SC instance
     public $escapeChar = ''; // Character to escape identifiers
 
-    // Prevent spawning
-    private function __construct() {}
-    private function __clone() {}
     public function __destruct()
     {
         $this->PDO = null;
@@ -22,7 +18,7 @@ class SC
     }
 
     /**
-     * Connect to a database and instantiate an SC object
+     * Connect to a database
      *
      * @param string $type
      * @param string $host
@@ -30,41 +26,36 @@ class SC
      * @param string $username [optional]
      * @param string $password [optional]
      * @param array $options [optional]
+     *
+     * @return SC $this
      */
-    public static function connect($type = '', $host = '', $dbname = '', $username = null, $password = null, array $options = array())
+    public function connect($type, $host, $dbname, $username = null, $password = null, array $options = array())
     {
-        if (!self::$instance) {
-            if (!$type && !$host && !$dbname) {
-                return false;
-            }
+        $dsn = "{$type}:host={$host};dbname={$dbname}";
+        $PDO = new PDO($dsn, $username, $password, $options);
 
-            self::$instance = new self();
-            $dsn = "{$type}:host={$host};dbname={$dbname}";
-            $PDO = new PDO($dsn, $username, $password, $options);
-
-            if (!$PDO) {
-                return false;
-            }
-
-            self::$instance->PDO = $PDO;
-
-            switch($PDO->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-                case 'pgsql':
-                case 'sqlsrv':
-                case 'dblib':
-                case 'mssql':
-                case 'sybase':
-                case 'firebird':
-                    self::$instance->escapeChar = '"';
-                case 'mysql':
-                case 'sqlite':
-                case 'sqlite2':
-                default:
-                    self::$instance->escapeChar = '`';
-            }
+        if (!$PDO) {
+            return false;
         }
 
-        return self::$instance;
+        $this->PDO = $PDO;
+
+        switch($PDO->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            case 'pgsql':
+            case 'sqlsrv':
+            case 'dblib':
+            case 'mssql':
+            case 'sybase':
+            case 'firebird':
+                $this->escapeChar = '"';
+            case 'mysql':
+            case 'sqlite':
+            case 'sqlite2':
+            default:
+                $this->escapeChar = '`';
+        }
+
+        return $this;
     }
 
     /**
@@ -188,7 +179,7 @@ class SC
         $parameters = array();
 
         foreach ($Data as $name => $value) {
-            $fields .= "{$this->escapeChar}$name{$this->escapeChar}, ";
+            $fields .= "{$this->escapeChar}{$name}{$this->escapeChar}, ";
             $values .= '?, ';
             $parameters []= $value;
         }

@@ -28,7 +28,7 @@ class Collection
         $this->table = $table;
 
         $this->escapeChar = $Base->escapeChar;
-        $this->tableClause = "{$this->escapeChar}$table{$this->escapeChar}";
+        $this->tableClause = "{$this->escapeChar}{$table}{$this->escapeChar}";
         $this->whereClause = '1';
     }
 
@@ -45,7 +45,7 @@ class Collection
     {
         $foreignKey = $foreignKey ?: $this->table.$this->Base->fkEnding;
 
-        $this->tableClause .= " LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar}";
+        $this->tableClause .= " LEFT JOIN {$this->escapeChar}{$table}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}{$table}{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar}";
 
         return $this;
     }
@@ -59,7 +59,7 @@ class Collection
     {
         $foreignKey = $foreignKey ?: $table.$this->Base->fkEnding;
 
-        $this->tableClause .= " LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar} = {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar}";
+        $this->tableClause .= " LEFT JOIN {$this->escapeChar}{$table}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar} = {$this->escapeChar}{$table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar}";
 
         return $this;
     }
@@ -80,8 +80,8 @@ class Collection
         $bKey = $table.$this->Base->fkEnding;
 
         $this->tableClause .= "
-			LEFT JOIN {$this->escapeChar}$joinTable{$this->escapeChar} ON {$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$joinTable{$this->escapeChar}.{$this->escapeChar}$aKey{$this->escapeChar}
-			LEFT JOIN {$this->escapeChar}$table{$this->escapeChar} ON {$this->escapeChar}$table{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}$joinTable{$this->escapeChar}.{$this->escapeChar}$bKey{$this->escapeChar}";
+			LEFT JOIN {$this->escapeChar}{$joinTable}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}{$joinTable}{$this->escapeChar}.{$this->escapeChar}$aKey{$this->escapeChar}
+			LEFT JOIN {$this->escapeChar}{$table}{$this->escapeChar} ON {$this->escapeChar}{$table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}{$joinTable}{$this->escapeChar}.{$this->escapeChar}$bKey{$this->escapeChar}";
 
         return $this;
     }
@@ -348,13 +348,13 @@ class Collection
      */
     public function update(array $Data)
     {
-        $statement = "UPDATE {$this->escapeChar}$this->table{$this->escapeChar} SET ";
+        $statement = "UPDATE {$this->escapeChar}{$this->table}{$this->escapeChar} SET ";
 
         $fields = array_keys($Data);
 
         foreach ($fields as $field)
         {
-            $statement .= "{$this->escapeChar}$this->table{$this->escapeChar}.{$this->escapeChar}$field{$this->escapeChar} = ?, ";
+            $statement .= "{$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}{$field}{$this->escapeChar} = ?, ";
         }
 
         $statement = substr_replace($statement, " WHERE $this->whereClause", - 2);
@@ -394,7 +394,7 @@ class Collection
      */
     protected function composeReadStatement($selectExpression = null)
     {
-        $selectExpression = $selectExpression ?: "{$this->escapeChar}$this->table{$this->escapeChar}.*";
+        $selectExpression = $selectExpression ?: "{$this->escapeChar}{$this->table}{$this->escapeChar}.*";
 
         $query = "SELECT $selectExpression FROM $this->tableClause WHERE $this->whereClause";
 

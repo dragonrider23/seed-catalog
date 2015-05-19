@@ -24,12 +24,11 @@ Include `SC.php`, `Collection.php`, and 'SCException.php' or install [the compos
 Connect to a database:
 ```php
 # initialize the connection
-# connect($dbtype, $host, $database, $username, $password);
-$SC = \SC\SC::connect('mysql', 'localhost', 'example', 'username', 'password');
-
-# to use the connection somewhere else, just call connect() with no parameters
-$SC = \SC\SC::connect();
 # connect() will return false if you haven't initialized it yet.
+# connect($dbtype, $host, $database, $username, $password)
+
+$SC = new \SC\SC();
+$SC->connect('mysql', 'localhost', 'example', 'username', 'password');
 ```
 
 Work with records:

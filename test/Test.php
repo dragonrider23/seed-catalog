@@ -6,8 +6,8 @@ class Test extends PHPUnit_Framework_TestCase
     {
         parent::__construct($name, $data, $dataName);
 
-        $Base = \SC\SC::connect('mysql', 'localhost', 'test', 'root');
-
+        $Base = new \SC\SC();
+        $Base->connect('mysql', 'localhost', 'test', 'root', 'a');
         $this->Base = $Base;
     }
 
