@@ -26,7 +26,6 @@ class Collection
     {
         $this->Base = $Base;
         $this->table = $table;
-
         $this->escapeChar = $Base->escapeChar;
         $this->tableClause = "{$this->escapeChar}{$table}{$this->escapeChar}";
         $this->whereClause = '1';
@@ -354,7 +353,7 @@ class Collection
 
         foreach ($fields as $field)
         {
-            $statement .= "{$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}{$field}{$this->escapeChar} = ?, ";
+            $statement .= "{$this->escapeChar}{$field}{$this->escapeChar} = ?, ";
         }
 
         $statement = substr_replace($statement, " WHERE $this->whereClause", - 2);
@@ -412,7 +411,7 @@ class Collection
     protected function escapeField($field)
     {
         $field = str_replace('`', '', $field);
-        $field = str_replace('.', '`.`', $field);
+        $field = str_replace('.', "{$this->escapeChar}.{$this->escapeChar}", $field);
         $field = $this->escapeChar.$field.$this->escapeChar;
 
         return $field;

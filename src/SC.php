@@ -22,16 +22,20 @@ class SC
      *
      * @param string $type
      * @param string $host
-     * @param string $dbname
+     * @param string $dbname [optional]
      * @param string $username [optional]
      * @param string $password [optional]
      * @param array $options [optional]
      *
      * @return SC $this
      */
-    public function connect($type, $host, $dbname, $username = null, $password = null, array $options = array())
+    public function connect($type, $host, $dbname = '', $username = null, $password = null, array $options = array())
     {
-        $dsn = "{$type}:host={$host};dbname={$dbname}";
+        if ($type == 'sqlite') {
+            $dsn = "{$type}:{$host}";
+        } else {
+            $dsn = "{$type}:host={$host};dbname={$dbname}";
+        }
         $PDO = new PDO($dsn, $username, $password, $options);
 
         if (!$PDO) {
@@ -47,14 +51,14 @@ class SC
             case 'mssql':
             case 'sybase':
             case 'firebird':
-                $this->escapeChar = '"';
-            case 'mysql':
             case 'sqlite':
             case 'sqlite2':
+                $this->escapeChar = '"';
+                break;
+            case 'mysql':
             default:
                 $this->escapeChar = '`';
         }
-
         return $this;
     }
 
@@ -229,6 +233,10 @@ class SC
     public function execute($statement, array $parameters = array())
     {
         $PDOStatement = $this->PDO->prepare($statement);
+
+        if (!$PDOStatement) {
+            return false;
+        }
 
         $successful = $PDOStatement->execute($parameters);
 
