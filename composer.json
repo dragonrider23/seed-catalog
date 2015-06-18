@@ -1,6 +1,7 @@
 {
     "name": "onesimus-systems/seed-catalog",
     "description": "Simple ORM.",
+    "version": "1.0.0",
     "keywords": ["orm", "database", "pdo"],
     "homepage": "https://github.com/onesimus-systems/seed-catalog",
     "type": "library",
