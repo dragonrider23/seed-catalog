@@ -243,7 +243,7 @@ class SC
         if (!$successful) {
             $errorInfo = $PDOStatement->errorInfo();
             $errorCode = $PDOStatement->errorCode();
-            throw new SCException($errorInfo[2].': '.$statement, $errorCode);
+            throw new SCException($errorInfo[2].': '.$statement.' | CODE: '.$errorCode);
         }
 
         return $PDOStatement;
