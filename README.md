@@ -24,11 +24,15 @@ Include `SC.php`, `Collection.php`, and 'SCException.php' or install [the compos
 Connect to a database:
 ```php
 # initialize the connection
-# connect() will return false if you haven't initialized it yet.
+# connect() will return false if connecting to the database fails.
 # connect($dbtype, $host, $database, $username, $password)
 
-$SC = new \SC\SC();
+$SC = new SC\SC();
 $SC->connect('mysql', 'localhost', 'example', 'username', 'password');
+
+# you can also give it a PDO object to use directly
+
+$SC = new SC\SC($pdo);
 ```
 
 Work with records:

@@ -1,7 +1,7 @@
 {
     "name": "onesimus-systems/seed-catalog",
     "description": "Simple ORM.",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "keywords": ["orm", "database", "pdo"],
     "homepage": "https://github.com/onesimus-systems/seed-catalog",
     "type": "library",
@@ -10,7 +10,8 @@
         {
             "name": "Emanuil Rusev",
             "email": "hello@erusev.com",
-            "homepage": "http://erusev.com"
+            "homepage": "http://erusev.com",
+            "role": "Original Developer"
         },
         {
             "name": "Lee Keitel",
