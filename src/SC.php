@@ -8,13 +8,22 @@ use PDOStatement;
 class SC
 {
     private $PDO; // PDO connection
-    public $fkEnding = '_id'; // Ending for FK names
-    public $escapeChar = ''; // Character to escape identifiers
+    protected $fkEnding = '_id'; // Ending for FK names
+    protected $escapeChar = ''; // Character to escape identifiers
+
+    /**
+     * Constructor
+     * @param PDO $pdo [optional] PDO object to use for database connections.
+     */
+    public function __construct(PDO $pdo = null)
+    {
+        $this->PDO = $pdo;
+        $this->setEscapeChar();
+    }
 
     public function __destruct()
     {
         $this->PDO = null;
-        return;
     }
 
     /**
@@ -31,6 +40,8 @@ class SC
      */
     public function connect($type, $host, $dbname = '', $username = null, $password = null, array $options = array())
     {
+        $dsn = '';
+
         if ($type == 'sqlite') {
             $dsn = "{$type}:{$host}";
         } else {
@@ -44,22 +55,23 @@ class SC
 
         $this->PDO = $PDO;
 
-        switch($PDO->getAttribute(PDO::ATTR_DRIVER_NAME)) {
-            case 'pgsql':
-            case 'sqlsrv':
-            case 'dblib':
-            case 'mssql':
-            case 'sybase':
-            case 'firebird':
-            case 'sqlite':
-            case 'sqlite2':
-                $this->escapeChar = '"';
-                break;
-            case 'mysql':
-            default:
-                $this->escapeChar = '`';
-        }
+        $this->setEscapeChar();
         return $this;
+    }
+
+    private function setEscapeChar()
+    {
+        if ($this->PDO === null) {
+            return;
+        }
+
+        switch($this->PDO->getAttribute(PDO::ATTR_DRIVER_NAME)) {
+            case 'mysql':
+                $this->escapeChar = '`';
+                break;
+            default:
+                $this->escapeChar = '"';
+        }
     }
 
     /**
@@ -219,9 +231,7 @@ class SC
      */
     public function find($table)
     {
-        $Collection = new Collection($this, $table);
-
-        return $Collection;
+        return new Collection($this, $table);
     }
 
     /**
@@ -243,7 +253,11 @@ class SC
         if (!$successful) {
             $errorInfo = $PDOStatement->errorInfo();
             $errorCode = $PDOStatement->errorCode();
-            throw new SCException($errorInfo[2].': '.$statement.' | CODE: '.$errorCode);
+            throw new SCException(
+                $errorInfo[2].': '.$statement, // Message
+                $errorCode,                    // ANSI Error Code
+                $errorInfo[1]                  // DB specific code
+            );
         }
 
         return $PDOStatement;
@@ -254,9 +268,7 @@ class SC
      */
     public function lastId()
     {
-        $lastInsertId = (int) $this->PDO->lastInsertId();
-
-        return $lastInsertId;
+        return (int) $this->PDO->lastInsertId();
     }
 
     /**
@@ -264,13 +276,16 @@ class SC
      */
     public function pdo()
     {
-        $PDO = $this->PDO;
-
-        return $PDO;
+        return $this->PDO;
     }
 
     public function getEscapeQuote()
     {
         return $this->escapeChar;
+    }
+
+    public function getFkEnding()
+    {
+        return $this->fkEnding;
     }
 }

@@ -26,7 +26,8 @@ class Collection
     {
         $this->Base = $Base;
         $this->table = $table;
-        $this->escapeChar = $Base->escapeChar;
+        $this->escapeChar = $Base->getEscapeQuote();
+        $this->fkEnding = $Base->getFkEnding();
         $this->tableClause = "{$this->escapeChar}{$table}{$this->escapeChar}";
         $this->whereClause = '1';
     }
@@ -42,7 +43,7 @@ class Collection
      */
     public function has($table, $foreignKey = null)
     {
-        $foreignKey = $foreignKey ?: $this->table.$this->Base->fkEnding;
+        $foreignKey = $foreignKey ?: $this->table.$this->fkEnding;
 
         $this->tableClause .= " LEFT JOIN {$this->escapeChar}{$table}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}{$table}{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar}";
 
@@ -56,7 +57,7 @@ class Collection
      */
     public function belongsTo($table, $foreignKey = null)
     {
-        $foreignKey = $foreignKey ?: $table.$this->Base->fkEnding;
+        $foreignKey = $foreignKey ?: $table.$this->fkEnding;
 
         $this->tableClause .= " LEFT JOIN {$this->escapeChar}{$table}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}$foreignKey{$this->escapeChar} = {$this->escapeChar}{$table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar}";
 
@@ -75,8 +76,8 @@ class Collection
 
         $joinTable = join('_', $tables);
 
-        $aKey = $this->table.$this->Base->fkEnding;
-        $bKey = $table.$this->Base->fkEnding;
+        $aKey = $this->table.$this->fkEnding;
+        $bKey = $table.$this->fkEnding;
 
         $this->tableClause .= "
 			LEFT JOIN {$this->escapeChar}{$joinTable}{$this->escapeChar} ON {$this->escapeChar}{$this->table}{$this->escapeChar}.{$this->escapeChar}id{$this->escapeChar} = {$this->escapeChar}{$joinTable}{$this->escapeChar}.{$this->escapeChar}$aKey{$this->escapeChar}

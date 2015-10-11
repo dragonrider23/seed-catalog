@@ -6,11 +6,21 @@ namespace SC;
 
 class SCException extends \Exception
 {
-    public function __construct($message, $code = 0, Exception $previous = null) {
-        parent::__construct($message, $code, $previous);
+    protected $dbCode;
+
+    public function __construct($message = '', $ansiCode = 0, $dbCode = 0)
+    {
+        parent::__construct($message, $ansiCode);
+        $this->dbCode = $dbCode;
     }
 
-    public function __toString() {
-        return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+    public function __toString()
+    {
+        return __CLASS__ . ": [{$this->code} | {$this->dbCode}]: {$this->message}\n";
+    }
+
+    public function getDbCode()
+    {
+        return $this->dbCode;
     }
 }
