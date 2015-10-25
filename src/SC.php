@@ -23,7 +23,7 @@ class SC
 
     public function __destruct()
     {
-        $this->PDO = null;
+        $this->disconnect();
     }
 
     /**
@@ -40,6 +40,11 @@ class SC
      */
     public function connect($type, $host, $dbname = '', $username = null, $password = null, array $options = array())
     {
+        if ($this->PDO) {
+            // If this object already has a PDO object, don't attempt a new connection
+            return $this;
+        }
+
         $dsn = '';
 
         if ($type == 'sqlite') {
@@ -57,6 +62,15 @@ class SC
 
         $this->setEscapeChar();
         return $this;
+    }
+
+    /**
+     * Disconnect from the current PDO
+     * @return void
+     */
+    public function disconnect()
+    {
+        $this->PDO = null;
     }
 
     private function setEscapeChar()
